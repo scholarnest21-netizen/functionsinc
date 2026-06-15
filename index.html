@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C Programming: Structures & File Processing | ScholarNest</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #e8eaf0;
+    --text-muted: #8892a4;
+    --text-dim: #555e70;
+    --code-bg: #0a0c11;
+    --code-keyword: #c792ea;
+    --code-string: #c3e88d;
+    --code-comment: #546e7a;
+    --code-number: #f78c6c;
+    --code-func: #82aaff;
+    --code-type: #ffcb6b;
+    --code-macro: #89ddff;
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOP NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(13,15,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    color: white;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -1px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    overflow-x: auto;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover { color: var(--accent); background: rgba(108,99,255,0.1); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 120px 32px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(108,99,255,0.12);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 .grad {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 17px;
+    max-width: 580px;
+    margin: 0 auto 40px;
+  }
+
+  .topic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── LAYOUT ── */
+  .page-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: sticky;
+    top: 76px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 0;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section { margin-bottom: 4px; }
+
+  .sidebar-group {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 20px 4px;
+  }
+
+  .sidebar a {
+    display: block;
+    padding: 6px 20px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .sidebar a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(108,99,255,0.05);
+  }
+
+  /* ── CONTENT ── */
+  .content { min-width: 0; }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, var(--surface2), var(--surface));
+  }
+
+  .section-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-purple { background: rgba(108,99,255,0.15); }
+  .icon-teal   { background: rgba(0,212,170,0.12); }
+  .icon-red    { background: rgba(255,107,107,0.12); }
+  .icon-yellow { background: rgba(255,209,102,0.12); }
+
+  .section-title-block h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+
+  .section-title-block .tag {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent2);
+    margin-top: 2px;
+  }
+
+  .section-body { padding: 28px; }
+
+  /* ── TOPIC BLOCK ── */
+  .topic-block { margin-bottom: 36px; }
+  .topic-block:last-child { margin-bottom: 0; }
+
+  .topic-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topic-title::before {
+    content: '';
+    width: 3px; height: 16px;
+    background: linear-gradient(var(--accent), var(--accent2));
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .topic-body {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.75;
+    margin-bottom: 16px;
+  }
+
+  .topic-body strong { color: var(--text); font-weight: 600; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: rgba(108,99,255,0.07);
+    border: 1px solid rgba(108,99,255,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #a5a0ff;
+    margin-bottom: 16px;
+  }
+
+  .tip-box {
+    background: rgba(0,212,170,0.07);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #4dd9c0;
+    margin-bottom: 16px;
+  }
+
+  .warn-box {
+    background: rgba(255,209,102,0.07);
+    border: 1px solid rgba(255,209,102,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #ffd166;
+    margin-bottom: 16px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .code-label {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  pre {
+    padding: 18px 20px;
+    overflow-x: auto;
+    line-height: 1.65;
+    tab-size: 4;
+  }
+
+  /* Syntax highlight via spans */
+  .kw  { color: var(--code-keyword); }
+  .ty  { color: var(--code-type); }
+  .fn  { color: var(--code-func); }
+  .st  { color: var(--code-string); }
+  .cm  { color: var(--code-comment); font-style: italic; }
+  .nm  { color: var(--code-number); }
+  .mc  { color: var(--code-macro); }
+  .op  { color: #89ddff; }
+  .pn  { color: #cdd3de; }
+
+  /* ── DIVIDER ── */
+  .topic-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── OUTPUT BOX ── */
+  .output-box {
+    background: #060809;
+    border: 1px solid #1e2535;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--accent2);
+    margin-top: -14px;
+    margin-bottom: 18px;
+  }
+
+  .output-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .data-table th {
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  footer p {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 780px) {
+    .page-wrapper { grid-template-columns: 1fr; }
+    .sidebar { position: static; max-height: none; }
+    nav { padding: 0 16px; }
+    .nav-links { display: none; }
+    .hero { padding: 90px 20px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://scholarnest21.netlify.app" class="nav-logo" target="_blank">
+    <div class="logo-icon">SN</div>
+    <span class="logo-text">Scholar<span>Nest</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#structures">Structures</a></li>
+    <li><a href="#nested">Nested</a></li>
+    <li><a href="#pointer-struct">Pointers</a></li>
+    <li><a href="#array-struct">Arrays</a></li>
+    <li><a href="#self-ref">Self-Ref</a></li>
+    <li><a href="#dynamic-mem">Dynamic Mem</a></li>
+    <li><a href="#linked-list">Linked List</a></li>
+    <li><a href="#typedef">typedef</a></li>
+    <li><a href="#files">Files</a></li>
+    <li><a href="#sequential">Sequential</a></li>
+    <li><a href="#random">Random</a></li>
+    <li><a href="#cmdargs">CLI Args</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🎓 ScholarNest Learning Series</div>
+  <h1>Structures &amp; File<br>Processing <span class="grad">in C</span></h1>
+  <p>A complete guide to structures, dynamic memory, linked lists, file I/O, and command-line arguments — with theory, syntax, and examples.</p>
+  <div class="topic-pills">
+    <span class="pill">struct</span>
+    <span class="pill">nested structs</span>
+    <span class="pill">struct pointers</span>
+    <span class="pill">array of structs</span>
+    <span class="pill">self-referential</span>
+    <span class="pill">malloc/free</span>
+    <span class="pill">linked list</span>
+    <span class="pill">typedef</span>
+    <span class="pill">fopen/fclose</span>
+    <span class="pill">fread/fwrite</span>
+    <span class="pill">fseek/ftell</span>
+    <span class="pill">argc/argv</span>
+  </div>
+</div>
+
+<!-- PAGE WRAPPER -->
+<div class="page-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-group">Structures</div>
+      <a href="#structures">What is a Structure?</a>
+      <a href="#nested">Nested Structures</a>
+      <a href="#pointer-struct">Pointer &amp; Structures</a>
+      <a href="#array-struct">Array of Structures</a>
+      <a href="#struct-example">Example Program</a>
+      <a href="#self-ref">Self-Referential</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-group">Memory</div>
+      <a href="#dynamic-mem">Dynamic Memory</a>
+      <a href="#linked-list">Singly Linked List</a>
+      <a href="#typedef">typedef</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-group">File Processing</div>
+      <a href="#files">Files in C</a>
+      <a href="#sequential">Sequential Access</a>
+      <a href="#avg-example">Avg Numbers Example</a>
+      <a href="#random">Random Access</a>
+      <a href="#cmdargs">Command Line Args</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ═══════════════════════════════════════
+         SECTION 1: STRUCTURES
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="structures">
+      <div class="section-header">
+        <div class="section-icon icon-purple">🏗️</div>
+        <div class="section-title-block">
+          <h2>Structures in C</h2>
+          <div class="tag">struct keyword · user-defined data type</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="topic-block">
+          <div class="topic-title">What is a Structure?</div>
+          <div class="topic-body">
+            A <strong>structure</strong> is a user-defined data type in C that allows grouping of variables of <em>different data types</em> under a single name. Unlike arrays (which store elements of the same type), structures can combine <code>int</code>, <code>float</code>, <code>char</code>, and other types together as a single logical unit called a <strong>record</strong>.
+            <br><br>
+            Structures are declared using the <strong><code>struct</code></strong> keyword. Each variable inside a structure is called a <strong>member</strong> or <strong>field</strong>. Once defined, a structure acts as a new data type from which variables can be created.
+          </div>
+          <div class="info-box">📌 Structures are fundamental to data modeling — they let you represent real-world entities like a Student, Employee, or Book as a single compound variable.</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Structure Declaration Syntax</span></div>
+            <pre><span class="kw">struct</span> <span class="ty">StructureName</span> <span class="pn">{</span>
+    datatype member1<span class="pn">;</span>
+    datatype member2<span class="pn">;</span>
+    <span class="cm">// ... more members</span>
+<span class="pn">};</span>
+
+<span class="cm">/* Example: Student structure */</span>
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span>
+    <span class="ty">int</span>   rollNo<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">50</span><span class="pn">];</span>
+    <span class="ty">float</span> marks<span class="pn">;</span>
+    <span class="ty">char</span>  grade<span class="pn">;</span>
+<span class="pn">};</span></pre>
+          </div>
+        </div>
+
+        <hr class="topic-divider">
+
+        <div class="topic-block">
+          <div class="topic-title">Declaring Structure Variables &amp; Accessing Members</div>
+          <div class="topic-body">
+            Structure variables are declared after the structure definition. Members are accessed using the <strong>dot operator (<code>.</code>)</strong>.
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Basic Structure</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;string.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span>
+    <span class="ty">int</span>   rollNo<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">50</span><span class="pn">];</span>
+    <span class="ty">float</span> marks<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Student</span> s1<span class="pn">;</span>          <span class="cm">// declare variable</span>
+
+    s1<span class="op">.</span>rollNo <span class="op">=</span> <span class="nm">101</span><span class="pn">;</span>
+    <span class="fn">strcpy</span><span class="pn">(</span>s1<span class="op">.</span>name<span class="pn">,</span> <span class="st">"Alice"</span><span class="pn">);</span>
+    s1<span class="op">.</span>marks <span class="op">=</span> <span class="nm">92.5</span><span class="pn">;</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Roll No : %d\n"</span><span class="pn">,</span> s1<span class="op">.</span>rollNo<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Name    : %s\n"</span><span class="pn">,</span> s1<span class="op">.</span>name<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Marks   : %.2f\n"</span><span class="pn">,</span> s1<span class="op">.</span>marks<span class="pn">);</span>
+
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Roll No : 101<br>Name    : Alice<br>Marks   : 92.50</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Initialization at Declaration</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Point</span> <span class="pn">{</span>
+    <span class="ty">int</span> x<span class="pn">,</span> y<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Point</span> p1 <span class="op">=</span> <span class="pn">{</span><span class="nm">3</span><span class="pn">,</span> <span class="nm">7</span><span class="pn">};</span>    <span class="cm">// initializer list</span>
+    <span class="kw">struct</span> <span class="ty">Point</span> p2 <span class="op">=</span> <span class="pn">{</span><span class="op">.</span>x <span class="op">=</span> <span class="nm">10</span><span class="pn">,</span> <span class="op">.</span>y <span class="op">=</span> <span class="nm">20</span><span class="pn">};</span>   <span class="cm">// designated</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"p1 = (%d, %d)\n"</span><span class="pn">,</span> p1<span class="op">.</span>x<span class="pn">,</span> p1<span class="op">.</span>y<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"p2 = (%d, %d)\n"</span><span class="pn">,</span> p2<span class="op">.</span>x<span class="pn">,</span> p2<span class="op">.</span>y<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>p1 = (3, 7)<br>p2 = (10, 20)</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – Structure as Function Argument (pass by value)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Rectangle</span> <span class="pn">{</span>
+    <span class="ty">float</span> length<span class="pn">,</span> width<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">float</span> <span class="fn">area</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Rectangle</span> r<span class="pn">)</span> <span class="pn">{</span>
+    <span class="kw">return</span> r<span class="op">.</span>length <span class="op">*</span> r<span class="op">.</span>width<span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Rectangle</span> rect <span class="op">=</span> <span class="pn">{</span><span class="nm">5.0</span><span class="pn">,</span> <span class="nm">3.0</span><span class="pn">};</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Area = %.2f\n"</span><span class="pn">,</span> <span class="fn">area</span><span class="pn">(</span>rect<span class="pn">));</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Area = 15.00</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 2: NESTED STRUCTURES
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="nested">
+      <div class="section-header">
+        <div class="section-icon icon-teal">🔗</div>
+        <div class="section-title-block">
+          <h2>Nested Structures</h2>
+          <div class="tag">struct inside struct · hierarchical data</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What are Nested Structures?</div>
+          <div class="topic-body">
+            A <strong>nested structure</strong> is a structure that has another structure as one of its members. This allows representing complex, hierarchical real-world data. For example, an <em>Employee</em> structure can contain a <em>Date</em> structure for the date of birth and a <em>Address</em> structure for the address.
+            <br><br>
+            Members of nested structures are accessed using the dot operator <strong>chained</strong>: <code>outer.inner.field</code>.
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Date inside Employee</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Date</span> <span class="pn">{</span>
+    <span class="ty">int</span> day<span class="pn">,</span> month<span class="pn">,</span> year<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="kw">struct</span> <span class="ty">Employee</span> <span class="pn">{</span>
+    <span class="ty">int</span>         id<span class="pn">;</span>
+    <span class="ty">char</span>        name<span class="pn">[</span><span class="nm">40</span><span class="pn">];</span>
+    <span class="kw">struct</span> <span class="ty">Date</span> dob<span class="pn">;</span>          <span class="cm">// nested structure</span>
+    <span class="ty">float</span>       salary<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Employee</span> e1 <span class="op">=</span> <span class="pn">{</span><span class="nm">1001</span><span class="pn">,</span> <span class="st">"Bob"</span><span class="pn">,</span> <span class="pn">{</span><span class="nm">15</span><span class="pn">,</span> <span class="nm">8</span><span class="pn">,</span> <span class="nm">1995</span><span class="pn">},</span> <span class="nm">45000.0</span><span class="pn">};</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"ID     : %d\n"</span><span class="pn">,</span> e1<span class="op">.</span>id<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Name   : %s\n"</span><span class="pn">,</span> e1<span class="op">.</span>name<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"DOB    : %d/%d/%d\n"</span><span class="pn">,</span>
+           e1<span class="op">.</span>dob<span class="op">.</span>day<span class="pn">,</span> e1<span class="op">.</span>dob<span class="op">.</span>month<span class="pn">,</span> e1<span class="op">.</span>dob<span class="op">.</span>year<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Salary : %.2f\n"</span><span class="pn">,</span> e1<span class="op">.</span>salary<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>ID     : 1001<br>Name   : Bob<br>DOB    : 15/8/1995<br>Salary : 45000.00</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Address inside Student (3-level nesting)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Address</span> <span class="pn">{</span>
+    <span class="ty">char</span> street<span class="pn">[</span><span class="nm">50</span><span class="pn">];</span>
+    <span class="ty">char</span> city<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">int</span>  pin<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span>
+    <span class="ty">int</span>            roll<span class="pn">;</span>
+    <span class="ty">char</span>           name<span class="pn">[</span><span class="nm">40</span><span class="pn">];</span>
+    <span class="kw">struct</span> <span class="ty">Address</span> addr<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Student</span> s <span class="op">=</span> <span class="pn">{</span><span class="nm">201</span><span class="pn">,</span> <span class="st">"Priya"</span><span class="pn">,</span> <span class="pn">{</span><span class="st">"MG Road"</span><span class="pn">,</span> <span class="st">"Jaipur"</span><span class="pn">,</span> <span class="nm">302001</span><span class="pn">}};</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"%s lives at %s, %s - %d\n"</span><span class="pn">,</span>
+           s<span class="op">.</span>name<span class="pn">,</span> s<span class="op">.</span>addr<span class="op">.</span>street<span class="pn">,</span> s<span class="op">.</span>addr<span class="op">.</span>city<span class="pn">,</span> s<span class="op">.</span>addr<span class="op">.</span>pin<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Priya lives at MG Road, Jaipur - 302001</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 3: POINTER AND STRUCTURES
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="pointer-struct">
+      <div class="section-header">
+        <div class="section-icon icon-red">👉</div>
+        <div class="section-title-block">
+          <h2>Pointer and Structures</h2>
+          <div class="tag">struct pointer · arrow operator → · pass by reference</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">Structure Pointers</div>
+          <div class="topic-body">
+            A <strong>pointer to a structure</strong> stores the address of a structure variable. Instead of the dot operator, the <strong>arrow operator (<code>-&gt;</code>)</strong> is used to access members through a pointer.
+            <br><br>
+            Using pointers with structures is more efficient when passing structures to functions, because only the address (4 or 8 bytes) is copied instead of the entire structure.
+          </div>
+          <div class="info-box">📌 <code>ptr-&gt;member</code> is equivalent to <code>(*ptr).member</code>. Always prefer the arrow operator for readability.</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Pointer to Structure</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Book</span> <span class="pn">{</span>
+    <span class="ty">char</span>  title<span class="pn">[</span><span class="nm">50</span><span class="pn">];</span>
+    <span class="ty">char</span>  author<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">float</span> price<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Book</span>  b1 <span class="op">=</span> <span class="pn">{</span><span class="st">"Let Us C"</span><span class="pn">,</span> <span class="st">"Kanetkar"</span><span class="pn">,</span> <span class="nm">299.0</span><span class="pn">};</span>
+    <span class="kw">struct</span> <span class="ty">Book</span> <span class="op">*</span>ptr <span class="op">=</span> <span class="op">&amp;</span>b1<span class="pn">;</span>    <span class="cm">// pointer to structure</span>
+
+    <span class="cm">/* Accessing via arrow operator */</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Title  : %s\n"</span><span class="pn">,</span> ptr<span class="op">-&gt;</span>title<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Author : %s\n"</span><span class="pn">,</span> ptr<span class="op">-&gt;</span>author<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Price  : Rs %.2f\n"</span><span class="pn">,</span> ptr<span class="op">-&gt;</span>price<span class="pn">);</span>
+
+    ptr<span class="op">-&gt;</span>price <span class="op">=</span> <span class="nm">350.0</span><span class="pn">;</span>    <span class="cm">// modifying via pointer</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"New Price: Rs %.2f\n"</span><span class="pn">,</span> b1<span class="op">.</span>price<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Title  : Let Us C<br>Author : Kanetkar<br>Price  : Rs 299.00<br>New Price: Rs 350.00</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Pass Structure by Pointer to Function</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Circle</span> <span class="pn">{</span>
+    <span class="ty">float</span> radius<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">void</span> <span class="fn">doubleRadius</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Circle</span> <span class="op">*</span>c<span class="pn">)</span> <span class="pn">{</span>
+    c<span class="op">-&gt;</span>radius <span class="op">*=</span> <span class="nm">2</span><span class="pn">;</span>    <span class="cm">// modifies original</span>
+<span class="pn">}</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Circle</span> c1 <span class="op">=</span> <span class="pn">{</span><span class="nm">5.0</span><span class="pn">};</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Before: r = %.1f\n"</span><span class="pn">,</span> c1<span class="op">.</span>radius<span class="pn">);</span>
+    <span class="fn">doubleRadius</span><span class="pn">(</span><span class="op">&amp;</span>c1<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"After : r = %.1f\n"</span><span class="pn">,</span> c1<span class="op">.</span>radius<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Before: r = 5.0<br>After : r = 10.0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 4: ARRAY OF STRUCTURES
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="array-struct">
+      <div class="section-header">
+        <div class="section-icon icon-yellow">📦</div>
+        <div class="section-title-block">
+          <h2>Array of Structures</h2>
+          <div class="tag">collection of records · struct arrays</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">Arrays of Structures</div>
+          <div class="topic-body">
+            An <strong>array of structures</strong> allows storing multiple records of the same structure type. Each element of the array is a complete structure variable. This is like a table — each row is a record, each column is a field.
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Student Records (Array of Structures)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span>
+    <span class="ty">int</span>   roll<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">float</span> marks<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Student</span> s<span class="pn">[</span><span class="nm">3</span><span class="pn">]</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pn">{</span><span class="nm">101</span><span class="pn">,</span> <span class="st">"Alice"</span><span class="pn">,</span> <span class="nm">88.5</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">102</span><span class="pn">,</span> <span class="st">"Bob"</span><span class="pn">,</span>   <span class="nm">75.0</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">103</span><span class="pn">,</span> <span class="st">"Carol"</span><span class="pn">,</span> <span class="nm">91.2</span><span class="pn">}</span>
+    <span class="pn">};</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"%-5s %-10s %s\n"</span><span class="pn">,</span> <span class="st">"Roll"</span><span class="pn">,</span> <span class="st">"Name"</span><span class="pn">,</span> <span class="st">"Marks"</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"------------------------\n"</span><span class="pn">);</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> <span class="nm">3</span><span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%-5d %-10s %.1f\n"</span><span class="pn">,</span>
+               s<span class="pn">[</span>i<span class="pn">].</span>roll<span class="pn">,</span> s<span class="pn">[</span>i<span class="pn">].</span>name<span class="pn">,</span> s<span class="pn">[</span>i<span class="pn">].</span>marks<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Roll  Name       Marks<br>------------------------<br>101   Alice      88.5<br>102   Bob        75.0<br>103   Carol      91.2</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Find Highest Marks in Array</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">float</span> marks<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Student</span> s<span class="pn">[</span><span class="nm">4</span><span class="pn">]</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pn">{</span><span class="st">"Raj"</span><span class="pn">,</span> <span class="nm">78.0</span><span class="pn">},</span> <span class="pn">{</span><span class="st">"Meena"</span><span class="pn">,</span> <span class="nm">95.5</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="st">"Tom"</span><span class="pn">,</span>  <span class="nm">88.0</span><span class="pn">},</span> <span class="pn">{</span><span class="st">"Sara"</span><span class="pn">,</span>  <span class="nm">92.0</span><span class="pn">}</span>
+    <span class="pn">};</span>
+    <span class="ty">int</span>   topIdx <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">1</span><span class="pn">;</span> i <span class="op">&lt;</span> <span class="nm">4</span><span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="kw">if</span> <span class="pn">(</span>s<span class="pn">[</span>i<span class="pn">].</span>marks <span class="op">&gt;</span> s<span class="pn">[</span>topIdx<span class="pn">].</span>marks<span class="pn">)</span> topIdx <span class="op">=</span> i<span class="pn">;</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Topper: %s (%.1f)\n"</span><span class="pn">,</span> s<span class="pn">[</span>topIdx<span class="pn">].</span>name<span class="pn">,</span> s<span class="pn">[</span>topIdx<span class="pn">].</span>marks<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Topper: Meena (95.5)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 5: EXAMPLE PROGRAM (Struct + Pointer)
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="struct-example">
+      <div class="section-header">
+        <div class="section-icon icon-purple">💡</div>
+        <div class="section-title-block">
+          <h2>Example Program: Structures &amp; Pointers</h2>
+          <div class="tag">comprehensive example · inventory system</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-body">A complete inventory management program combining arrays of structures with pointer-based operations.</div>
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Inventory System – Struct + Pointer + Array</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;string.h&gt;</span>
+
+<span class="mc">#define</span> <span class="ty">MAX</span> <span class="nm">5</span>
+
+<span class="kw">struct</span> <span class="ty">Product</span> <span class="pn">{</span>
+    <span class="ty">int</span>   id<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">int</span>   qty<span class="pn">;</span>
+    <span class="ty">float</span> price<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">void</span> <span class="fn">display</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Product</span> <span class="op">*</span>p<span class="pn">,</span> <span class="ty">int</span> n<span class="pn">)</span> <span class="pn">{</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\n%-5s %-15s %-8s %s\n"</span><span class="pn">,</span> <span class="st">"ID"</span><span class="pn">,</span> <span class="st">"Name"</span><span class="pn">,</span> <span class="st">"Qty"</span><span class="pn">,</span> <span class="st">"Price"</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"-----------------------------------\n"</span><span class="pn">);</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> n<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%-5d %-15s %-8d %.2f\n"</span><span class="pn">,</span>
+               <span class="pn">(</span>p<span class="op">+</span>i<span class="pn">)</span><span class="op">-&gt;</span>id<span class="pn">,</span> <span class="pn">(</span>p<span class="op">+</span>i<span class="pn">)</span><span class="op">-&gt;</span>name<span class="pn">,</span>
+               <span class="pn">(</span>p<span class="op">+</span>i<span class="pn">)</span><span class="op">-&gt;</span>qty<span class="pn">,</span> <span class="pn">(</span>p<span class="op">+</span>i<span class="pn">)</span><span class="op">-&gt;</span>price<span class="pn">);</span>
+<span class="pn">}</span>
+
+<span class="ty">float</span> <span class="fn">totalValue</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Product</span> <span class="op">*</span>p<span class="pn">,</span> <span class="ty">int</span> n<span class="pn">)</span> <span class="pn">{</span>
+    <span class="ty">float</span> total <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> n<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        total <span class="op">+=</span> p<span class="pn">[</span>i<span class="pn">].</span>qty <span class="op">*</span> p<span class="pn">[</span>i<span class="pn">].</span>price<span class="pn">;</span>
+    <span class="kw">return</span> total<span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Product</span> inv<span class="pn">[</span><span class="ty">MAX</span><span class="pn">]</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pn">{</span><span class="nm">1</span><span class="pn">,</span> <span class="st">"Laptop"</span><span class="pn">,</span>    <span class="nm">10</span><span class="pn">,</span> <span class="nm">55000.0</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">2</span><span class="pn">,</span> <span class="st">"Mouse"</span><span class="pn">,</span>     <span class="nm">50</span><span class="pn">,</span>   <span class="nm">450.0</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">3</span><span class="pn">,</span> <span class="st">"Keyboard"</span><span class="pn">,</span>  <span class="nm">30</span><span class="pn">,</span>  <span class="nm">1200.0</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">4</span><span class="pn">,</span> <span class="st">"Monitor"</span><span class="pn">,</span>   <span class="nm">15</span><span class="pn">,</span> <span class="nm">12000.0</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">5</span><span class="pn">,</span> <span class="st">"USB Hub"</span><span class="pn">,</span>   <span class="nm">40</span><span class="pn">,</span>   <span class="nm">800.0</span><span class="pn">}</span>
+    <span class="pn">};</span>
+
+    <span class="fn">display</span><span class="pn">(</span>inv<span class="pn">,</span> <span class="ty">MAX</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\nTotal Inventory Value: Rs %.2f\n"</span><span class="pn">,</span> <span class="fn">totalValue</span><span class="pn">(</span>inv<span class="pn">,</span> <span class="ty">MAX</span><span class="pn">));</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>ID    Name            Qty      Price<br>-----------------------------------<br>1     Laptop          10       55000.00<br>2     Mouse           50       450.00<br>3     Keyboard        30       1200.00<br>4     Monitor         15       12000.00<br>5     USB Hub         40       800.00<br><br>Total Inventory Value: Rs 659500.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 6: SELF-REFERENTIAL STRUCTURES
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="self-ref">
+      <div class="section-header">
+        <div class="section-icon icon-teal">🔄</div>
+        <div class="section-title-block">
+          <h2>Self-Referential Structures</h2>
+          <div class="tag">struct pointer to itself · foundation of linked lists &amp; trees</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What is a Self-Referential Structure?</div>
+          <div class="topic-body">
+            A <strong>self-referential structure</strong> contains a <em>pointer member that points to the same structure type</em>. This is the fundamental building block for dynamic data structures like linked lists, trees, stacks, and queues.
+            <br><br>
+            The pointer doesn't contain another structure (that would be infinite size), it contains only the <em>address</em> of another structure of the same type — so the size remains finite.
+          </div>
+          <div class="warn-box">⚠️ A structure <em>cannot contain itself</em> (infinite recursion), but it <em>can contain a pointer to itself</em> — pointers have a fixed size regardless of what they point to.</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Self-Referential Structure Syntax</span></div>
+            <pre><span class="kw">struct</span> <span class="ty">Node</span> <span class="pn">{</span>
+    <span class="ty">int</span>          data<span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>next<span class="pn">;</span>    <span class="cm">// pointer to same type</span>
+<span class="pn">};</span>
+
+<span class="cm">/* Tree node — two self-referential pointers */</span>
+<span class="kw">struct</span> <span class="ty">TreeNode</span> <span class="pn">{</span>
+    <span class="ty">int</span>              value<span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">TreeNode</span> <span class="op">*</span>left<span class="pn">,</span> <span class="op">*</span>right<span class="pn">;</span>
+<span class="pn">};</span></pre>
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example – Manually Chaining 3 Nodes</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Node</span> <span class="pn">{</span>
+    <span class="ty">int</span>          data<span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>next<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> n1<span class="pn">,</span> n2<span class="pn">,</span> n3<span class="pn">;</span>
+    n1<span class="op">.</span>data <span class="op">=</span> <span class="nm">10</span><span class="pn">;</span>  n1<span class="op">.</span>next <span class="op">=</span> <span class="op">&amp;</span>n2<span class="pn">;</span>
+    n2<span class="op">.</span>data <span class="op">=</span> <span class="nm">20</span><span class="pn">;</span>  n2<span class="op">.</span>next <span class="op">=</span> <span class="op">&amp;</span>n3<span class="pn">;</span>
+    n3<span class="op">.</span>data <span class="op">=</span> <span class="nm">30</span><span class="pn">;</span>  n3<span class="op">.</span>next <span class="op">=</span> <span class="mc">NULL</span><span class="pn">;</span>
+
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>ptr <span class="op">=</span> <span class="op">&amp;</span>n1<span class="pn">;</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Linked list: "</span><span class="pn">);</span>
+    <span class="kw">while</span> <span class="pn">(</span>ptr <span class="op">!=</span> <span class="mc">NULL</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d "</span><span class="pn">,</span> ptr<span class="op">-&gt;</span>data<span class="pn">);</span>
+        ptr <span class="op">=</span> ptr<span class="op">-&gt;</span>next<span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\n"</span><span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Linked list: 10 20 30</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 7: DYNAMIC MEMORY ALLOCATION
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="dynamic-mem">
+      <div class="section-header">
+        <div class="section-icon icon-red">🧠</div>
+        <div class="section-title-block">
+          <h2>Dynamic Memory Allocation</h2>
+          <div class="tag">malloc · calloc · realloc · free · &lt;stdlib.h&gt;</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What is Dynamic Memory Allocation?</div>
+          <div class="topic-body">
+            In C, memory can be allocated in two ways: <strong>statically</strong> (at compile time, like arrays) or <strong>dynamically</strong> (at runtime, using heap memory). Dynamic allocation lets programs request memory while running — useful when the size is not known in advance.
+            <br><br>
+            The four key functions from <code>&lt;stdlib.h&gt;</code>:
+          </div>
+
+          <table class="data-table">
+            <tr><th>Function</th><th>Purpose</th><th>Returns</th></tr>
+            <tr><td>malloc(size)</td><td>Allocates <em>size</em> bytes (uninitialized)</td><td>void* or NULL</td></tr>
+            <tr><td>calloc(n, size)</td><td>Allocates n×size bytes (zero-initialized)</td><td>void* or NULL</td></tr>
+            <tr><td>realloc(ptr, size)</td><td>Resizes previously allocated block</td><td>void* or NULL</td></tr>
+            <tr><td>free(ptr)</td><td>Releases allocated memory back to heap</td><td>void</td></tr>
+          </table>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – malloc and free</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">int</span> n<span class="pn">,</span> i<span class="pn">;</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Enter count: "</span><span class="pn">);</span>
+    <span class="fn">scanf</span><span class="pn">(</span><span class="st">"%d"</span><span class="pn">,</span> <span class="op">&amp;</span>n<span class="pn">);</span>
+
+    <span class="ty">int</span> <span class="op">*</span>arr <span class="op">=</span> <span class="pn">(</span><span class="ty">int</span><span class="op">*</span><span class="pn">)</span><span class="fn">malloc</span><span class="pn">(</span>n <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="ty">int</span><span class="pn">));</span>
+    <span class="kw">if</span> <span class="pn">(</span>arr <span class="op">==</span> <span class="mc">NULL</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"Memory allocation failed!\n"</span><span class="pn">);</span>
+        <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="kw">for</span> <span class="pn">(</span>i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> n<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span> arr<span class="pn">[</span>i<span class="pn">]</span> <span class="op">=</span> <span class="pn">(</span>i <span class="op">+</span> <span class="nm">1</span><span class="pn">)</span> <span class="op">*</span> <span class="nm">10</span><span class="pn">;</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Array: "</span><span class="pn">);</span>
+    <span class="kw">for</span> <span class="pn">(</span>i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> n<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d "</span><span class="pn">,</span> arr<span class="pn">[</span>i<span class="pn">]);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\n"</span><span class="pn">);</span>
+
+    <span class="fn">free</span><span class="pn">(</span>arr<span class="pn">);</span>    <span class="cm">// release memory</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output (for n=4)</div>Enter count: 4<br>Array: 10 20 30 40</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – calloc (zero-initialized)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">int</span> <span class="op">*</span>arr <span class="op">=</span> <span class="pn">(</span><span class="ty">int</span><span class="op">*</span><span class="pn">)</span><span class="fn">calloc</span><span class="pn">(</span><span class="nm">5</span><span class="pn">,</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="ty">int</span><span class="pn">));</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"calloc (all zeros): "</span><span class="pn">);</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> <span class="nm">5</span><span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d "</span><span class="pn">,</span> arr<span class="pn">[</span>i<span class="pn">]);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\n"</span><span class="pn">);</span>
+
+    <span class="cm">/* Resize to 8 elements */</span>
+    arr <span class="op">=</span> <span class="pn">(</span><span class="ty">int</span><span class="op">*</span><span class="pn">)</span><span class="fn">realloc</span><span class="pn">(</span>arr<span class="pn">,</span> <span class="nm">8</span> <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="ty">int</span><span class="pn">));</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"After realloc (8 elements, last 3 uninitialized):\n"</span><span class="pn">);</span>
+    <span class="fn">free</span><span class="pn">(</span>arr<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>calloc (all zeros): 0 0 0 0 0</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – Dynamic Array of Structures</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;string.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Student</span> <span class="pn">{</span> <span class="ty">char</span> name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span> <span class="ty">float</span> gpa<span class="pn">;</span> <span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">int</span> n <span class="op">=</span> <span class="nm">3</span><span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">Student</span> <span class="op">*</span>s <span class="op">=</span> <span class="pn">(</span><span class="kw">struct</span> <span class="ty">Student</span><span class="op">*</span><span class="pn">)</span>
+                        <span class="fn">malloc</span><span class="pn">(</span>n <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Student</span><span class="pn">));</span>
+    <span class="fn">strcpy</span><span class="pn">(</span>s<span class="pn">[</span><span class="nm">0</span><span class="pn">].</span>name<span class="pn">,</span> <span class="st">"Amit"</span><span class="pn">);</span>   s<span class="pn">[</span><span class="nm">0</span><span class="pn">].</span>gpa <span class="op">=</span> <span class="nm">8.5</span><span class="pn">;</span>
+    <span class="fn">strcpy</span><span class="pn">(</span>s<span class="pn">[</span><span class="nm">1</span><span class="pn">].</span>name<span class="pn">,</span> <span class="st">"Neha"</span><span class="pn">);</span>   s<span class="pn">[</span><span class="nm">1</span><span class="pn">].</span>gpa <span class="op">=</span> <span class="nm">9.1</span><span class="pn">;</span>
+    <span class="fn">strcpy</span><span class="pn">(</span>s<span class="pn">[</span><span class="nm">2</span><span class="pn">].</span>name<span class="pn">,</span> <span class="st">"Kiran"</span><span class="pn">);</span>  s<span class="pn">[</span><span class="nm">2</span><span class="pn">].</span>gpa <span class="op">=</span> <span class="nm">7.8</span><span class="pn">;</span>
+
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> n<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%s: GPA %.1f\n"</span><span class="pn">,</span> s<span class="pn">[</span>i<span class="pn">].</span>name<span class="pn">,</span> s<span class="pn">[</span>i<span class="pn">].</span>gpa<span class="pn">);</span>
+
+    <span class="fn">free</span><span class="pn">(</span>s<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Amit: GPA 8.5<br>Neha: GPA 9.1<br>Kiran: GPA 7.8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 8: SINGLY LINKED LIST
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="linked-list">
+      <div class="section-header">
+        <div class="section-icon icon-purple">⛓️</div>
+        <div class="section-title-block">
+          <h2>Singly Linked List</h2>
+          <div class="tag">nodes · head pointer · insert · delete · traverse</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What is a Singly Linked List?</div>
+          <div class="topic-body">
+            A <strong>singly linked list</strong> is a dynamic data structure where each element (called a <strong>node</strong>) stores data and a pointer to the next node. Unlike arrays, linked lists don't require contiguous memory — nodes can be scattered in heap memory and linked via pointers.
+            <br><br>
+            Key properties: <strong>Head</strong> points to the first node. The <strong>last node's</strong> next pointer is <code>NULL</code>. Traversal goes in one direction only (forward).
+          </div>
+          <div class="tip-box">✅ Linked lists allow O(1) insertion/deletion at the front and dynamic sizing — advantages over static arrays.</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Complete Singly Linked List – Insert, Delete, Display</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Node</span> <span class="pn">{</span>
+    <span class="ty">int</span>          data<span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>next<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="cm">/* Create a new node */</span>
+<span class="kw">struct</span> <span class="ty">Node</span><span class="op">*</span> <span class="fn">newNode</span><span class="pn">(</span><span class="ty">int</span> val<span class="pn">)</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>n <span class="op">=</span> <span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span><span class="op">*</span><span class="pn">)</span><span class="fn">malloc</span><span class="pn">(</span><span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span><span class="pn">));</span>
+    n<span class="op">-&gt;</span>data <span class="op">=</span> val<span class="pn">;</span>
+    n<span class="op">-&gt;</span>next <span class="op">=</span> <span class="mc">NULL</span><span class="pn">;</span>
+    <span class="kw">return</span> n<span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Insert at beginning */</span>
+<span class="ty">void</span> <span class="fn">insertFront</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span> <span class="op">**</span>head<span class="pn">,</span> <span class="ty">int</span> val<span class="pn">)</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>n <span class="op">=</span> <span class="fn">newNode</span><span class="pn">(</span>val<span class="pn">);</span>
+    n<span class="op">-&gt;</span>next <span class="op">=</span> <span class="op">*</span>head<span class="pn">;</span>
+    <span class="op">*</span>head <span class="op">=</span> n<span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Insert at end */</span>
+<span class="ty">void</span> <span class="fn">insertEnd</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span> <span class="op">**</span>head<span class="pn">,</span> <span class="ty">int</span> val<span class="pn">)</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>n <span class="op">=</span> <span class="fn">newNode</span><span class="pn">(</span>val<span class="pn">);</span>
+    <span class="kw">if</span> <span class="pn">(</span><span class="op">*</span>head <span class="op">==</span> <span class="mc">NULL</span><span class="pn">)</span> <span class="pn">{</span> <span class="op">*</span>head <span class="op">=</span> n<span class="pn">;</span> <span class="kw">return</span><span class="pn">;</span> <span class="pn">}</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>tmp <span class="op">=</span> <span class="op">*</span>head<span class="pn">;</span>
+    <span class="kw">while</span> <span class="pn">(</span>tmp<span class="op">-&gt;</span>next<span class="pn">)</span> tmp <span class="op">=</span> tmp<span class="op">-&gt;</span>next<span class="pn">;</span>
+    tmp<span class="op">-&gt;</span>next <span class="op">=</span> n<span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Delete a node by value */</span>
+<span class="ty">void</span> <span class="fn">deleteNode</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span> <span class="op">**</span>head<span class="pn">,</span> <span class="ty">int</span> val<span class="pn">)</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>curr <span class="op">=</span> <span class="op">*</span>head<span class="pn">,</span> <span class="op">*</span>prev <span class="op">=</span> <span class="mc">NULL</span><span class="pn">;</span>
+    <span class="kw">while</span> <span class="pn">(</span>curr <span class="op">&amp;&amp;</span> curr<span class="op">-&gt;</span>data <span class="op">!=</span> val<span class="pn">)</span>
+        <span class="pn">{</span> prev <span class="op">=</span> curr<span class="pn">;</span> curr <span class="op">=</span> curr<span class="op">-&gt;</span>next<span class="pn">;</span> <span class="pn">}</span>
+    <span class="kw">if</span> <span class="pn">(</span><span class="op">!</span>curr<span class="pn">)</span> <span class="pn">{</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d not found\n"</span><span class="pn">,</span> val<span class="pn">);</span> <span class="kw">return</span><span class="pn">;</span> <span class="pn">}</span>
+    <span class="kw">if</span> <span class="pn">(</span><span class="op">!</span>prev<span class="pn">)</span> <span class="op">*</span>head <span class="op">=</span> curr<span class="op">-&gt;</span>next<span class="pn">;</span>
+    <span class="kw">else</span>       prev<span class="op">-&gt;</span>next <span class="op">=</span> curr<span class="op">-&gt;</span>next<span class="pn">;</span>
+    <span class="fn">free</span><span class="pn">(</span>curr<span class="pn">);</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Display list */</span>
+<span class="ty">void</span> <span class="fn">display</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>head<span class="pn">)</span> <span class="pn">{</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"List: "</span><span class="pn">);</span>
+    <span class="kw">while</span> <span class="pn">(</span>head<span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d"</span><span class="pn">,</span> head<span class="op">-&gt;</span>data<span class="pn">);</span>
+        <span class="kw">if</span> <span class="pn">(</span>head<span class="op">-&gt;</span>next<span class="pn">)</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">" -> "</span><span class="pn">);</span>
+        head <span class="op">=</span> head<span class="op">-&gt;</span>next<span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">" -> NULL\n"</span><span class="pn">);</span>
+<span class="pn">}</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>head <span class="op">=</span> <span class="mc">NULL</span><span class="pn">;</span>
+    <span class="fn">insertEnd</span><span class="pn">(</span><span class="op">&amp;</span>head<span class="pn">,</span> <span class="nm">10</span><span class="pn">);</span>
+    <span class="fn">insertEnd</span><span class="pn">(</span><span class="op">&amp;</span>head<span class="pn">,</span> <span class="nm">20</span><span class="pn">);</span>
+    <span class="fn">insertEnd</span><span class="pn">(</span><span class="op">&amp;</span>head<span class="pn">,</span> <span class="nm">30</span><span class="pn">);</span>
+    <span class="fn">insertFront</span><span class="pn">(</span><span class="op">&amp;</span>head<span class="pn">,</span> <span class="nm">5</span><span class="pn">);</span>
+    <span class="fn">display</span><span class="pn">(</span>head<span class="pn">);</span>
+
+    <span class="fn">deleteNode</span><span class="pn">(</span><span class="op">&amp;</span>head<span class="pn">,</span> <span class="nm">20</span><span class="pn">);</span>
+    <span class="fn">display</span><span class="pn">(</span>head<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>List: 5 -> 10 -> 20 -> 30 -> NULL<br>List: 5 -> 10 -> 30 -> NULL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 9: TYPEDEF
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="typedef">
+      <div class="section-header">
+        <div class="section-icon icon-yellow">🏷️</div>
+        <div class="section-title-block">
+          <h2>typedef in C</h2>
+          <div class="tag">type alias · cleaner code · struct shorthand</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What is typedef?</div>
+          <div class="topic-body">
+            <strong><code>typedef</code></strong> creates an alias (alternate name) for an existing data type. It doesn't create a new type — it gives an existing type a new, shorter, or more meaningful name. It is most commonly used with structures and pointers to simplify code.
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – typedef with Primitive Types</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="ty">unsigned int</span> <span class="ty">uint</span><span class="pn">;</span>
+<span class="kw">typedef</span> <span class="ty">float</span>        <span class="ty">real</span><span class="pn">;</span>
+<span class="kw">typedef</span> <span class="ty">char</span>         <span class="ty">String</span><span class="pn">[</span><span class="nm">50</span><span class="pn">];</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">uint</span>   age    <span class="op">=</span> <span class="nm">21</span><span class="pn">;</span>
+    <span class="ty">real</span>   gpa    <span class="op">=</span> <span class="nm">8.75</span><span class="pn">;</span>
+    <span class="ty">String</span> course <span class="op">=</span> <span class="st">"Computer Science"</span><span class="pn">;</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Age: %u, GPA: %.2f, Course: %s\n"</span><span class="pn">,</span> age<span class="pn">,</span> gpa<span class="pn">,</span> course<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – typedef with Structures (most common usage)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="pn">{</span>
+    <span class="ty">int</span>   roll<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span>
+    <span class="ty">float</span> gpa<span class="pn">;</span>
+<span class="pn">}</span> <span class="ty">Student</span><span class="pn">;</span>    <span class="cm">// no "struct" keyword needed now</span>
+
+<span class="ty">void</span> <span class="fn">print</span><span class="pn">(</span><span class="ty">Student</span> <span class="op">*</span>s<span class="pn">)</span> <span class="pn">{</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d | %-10s | %.2f\n"</span><span class="pn">,</span> s<span class="op">-&gt;</span>roll<span class="pn">,</span> s<span class="op">-&gt;</span>name<span class="pn">,</span> s<span class="op">-&gt;</span>gpa<span class="pn">);</span>
+<span class="pn">}</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">Student</span> s1 <span class="op">=</span> <span class="pn">{</span><span class="nm">101</span><span class="pn">,</span> <span class="st">"Anjali"</span><span class="pn">,</span> <span class="nm">9.0</span><span class="pn">};</span>
+    <span class="ty">Student</span> s2 <span class="op">=</span> <span class="pn">{</span><span class="nm">102</span><span class="pn">,</span> <span class="st">"Rohan"</span><span class="pn">,</span>  <span class="nm">8.3</span><span class="pn">};</span>
+    <span class="fn">print</span><span class="pn">(</span><span class="op">&amp;</span>s1<span class="pn">);</span>
+    <span class="fn">print</span><span class="pn">(</span><span class="op">&amp;</span>s2<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>101 | Anjali     | 9.00<br>102 | Rohan      | 8.30</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – typedef with Linked List Node</span></div>
+            <pre><span class="kw">typedef</span> <span class="kw">struct</span> <span class="ty">Node</span> <span class="pn">{</span>
+    <span class="ty">int</span>         data<span class="pn">;</span>
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span>next<span class="pn">;</span>
+<span class="pn">}</span> <span class="ty">Node</span><span class="pn">;</span>
+
+<span class="cm">/* Now we can write: Node *head; instead of struct Node *head; */</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 10: FILE PROCESSING
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="files">
+      <div class="section-header">
+        <div class="section-icon icon-teal">📁</div>
+        <div class="section-title-block">
+          <h2>File Processing in C</h2>
+          <div class="tag">fopen · fclose · fprintf · fscanf · fread · fwrite</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What are Files?</div>
+          <div class="topic-body">
+            A <strong>file</strong> is a collection of related data stored permanently on a secondary storage device (disk). Unlike variables (which lose values when a program ends), files persist data between program runs.
+            <br><br>
+            C provides the <strong>FILE</strong> pointer type (from <code>&lt;stdio.h&gt;</code>) for working with files. Key functions:
+          </div>
+
+          <table class="data-table">
+            <tr><th>Function</th><th>Purpose</th></tr>
+            <tr><td>fopen(name, mode)</td><td>Open a file; returns FILE pointer</td></tr>
+            <tr><td>fclose(fp)</td><td>Close an open file</td></tr>
+            <tr><td>fprintf(fp, ...)</td><td>Write formatted text to file</td></tr>
+            <tr><td>fscanf(fp, ...)</td><td>Read formatted text from file</td></tr>
+            <tr><td>fputc / fgetc</td><td>Write/read single character</td></tr>
+            <tr><td>fputs / fgets</td><td>Write/read string</td></tr>
+            <tr><td>fwrite / fread</td><td>Binary block write/read</td></tr>
+            <tr><td>fseek / ftell / rewind</td><td>Random access positioning</td></tr>
+            <tr><td>feof(fp)</td><td>Check end-of-file</td></tr>
+          </table>
+
+          <div class="topic-title">File Opening Modes</div>
+          <table class="data-table">
+            <tr><th>Mode</th><th>Meaning</th></tr>
+            <tr><td>"r"</td><td>Open for reading (file must exist)</td></tr>
+            <tr><td>"w"</td><td>Open for writing (creates or overwrites)</td></tr>
+            <tr><td>"a"</td><td>Open for appending (adds to end)</td></tr>
+            <tr><td>"r+"</td><td>Open for reading and writing</td></tr>
+            <tr><td>"w+"</td><td>Open for read/write (overwrites)</td></tr>
+            <tr><td>"rb"/"wb"</td><td>Binary read/write modes</td></tr>
+          </table>
+
+          <div class="topic-title">Types of File Processing</div>
+          <div class="topic-body">
+            There are two primary types: <strong>Sequential Access</strong> (read/write records one after another, from beginning) and <strong>Random Access</strong> (jump directly to any record using its position). Text files are typically sequential; binary files support efficient random access.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 11: SEQUENTIAL ACCESS
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="sequential">
+      <div class="section-header">
+        <div class="section-icon icon-yellow">📄</div>
+        <div class="section-title-block">
+          <h2>Sequential Access File</h2>
+          <div class="tag">text files · read in order · fprintf · fscanf · feof</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">Sequential Access</div>
+          <div class="topic-body">
+            In <strong>sequential access</strong>, data is read or written in order from the beginning of the file to the end — like reading a book page by page. You cannot jump directly to record #50 without reading records 1–49 first.
+            <br><br>
+            Sequential access files are typically <strong>text files</strong> and use <code>fprintf</code> / <code>fscanf</code> for writing and reading formatted data.
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Write to Sequential File</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"students.txt"</span><span class="pn">,</span> <span class="st">"w"</span><span class="pn">);</span>
+    <span class="kw">if</span> <span class="pn">(</span>fp <span class="op">==</span> <span class="mc">NULL</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"Cannot open file!\n"</span><span class="pn">);</span>
+        <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="fn">fprintf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d %s %.2f\n"</span><span class="pn">,</span> <span class="nm">101</span><span class="pn">,</span> <span class="st">"Alice"</span><span class="pn">,</span> <span class="nm">88.5</span><span class="pn">);</span>
+    <span class="fn">fprintf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d %s %.2f\n"</span><span class="pn">,</span> <span class="nm">102</span><span class="pn">,</span> <span class="st">"Bob"</span><span class="pn">,</span>   <span class="nm">75.0</span><span class="pn">);</span>
+    <span class="fn">fprintf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d %s %.2f\n"</span><span class="pn">,</span> <span class="nm">103</span><span class="pn">,</span> <span class="st">"Carol"</span><span class="pn">,</span> <span class="nm">91.2</span><span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"File written successfully.\n"</span><span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">students.txt contents</div>101 Alice 88.50<br>102 Bob 75.00<br>103 Carol 91.20</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Read from Sequential File</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"students.txt"</span><span class="pn">,</span> <span class="st">"r"</span><span class="pn">);</span>
+    <span class="ty">int</span>  roll<span class="pn">;</span> <span class="ty">char</span> name<span class="pn">[</span><span class="nm">30</span><span class="pn">];</span> <span class="ty">float</span> marks<span class="pn">;</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Roll  Name      Marks\n"</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"---------------------\n"</span><span class="pn">);</span>
+    <span class="kw">while</span> <span class="pn">(</span><span class="fn">fscanf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d %s %f"</span><span class="pn">,</span> <span class="op">&amp;</span>roll<span class="pn">,</span> name<span class="pn">,</span> <span class="op">&amp;</span>marks<span class="pn">)</span> <span class="op">==</span> <span class="nm">3</span><span class="pn">)</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%-5d %-10s %.2f\n"</span><span class="pn">,</span> roll<span class="pn">,</span> name<span class="pn">,</span> marks<span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Roll  Name      Marks<br>---------------------<br>101   Alice      88.50<br>102   Bob        75.00<br>103   Carol      91.20</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – Character-by-Character Copy</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>src  <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"source.txt"</span><span class="pn">,</span>  <span class="st">"r"</span><span class="pn">);</span>
+    <span class="ty">FILE</span> <span class="op">*</span>dest <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"dest.txt"</span><span class="pn">,</span>    <span class="st">"w"</span><span class="pn">);</span>
+    <span class="ty">int</span> ch<span class="pn">;</span>
+    <span class="kw">while</span> <span class="pn">((</span>ch <span class="op">=</span> <span class="fn">fgetc</span><span class="pn">(</span>src<span class="pn">))</span> <span class="op">!=</span> <span class="mc">EOF</span><span class="pn">)</span>
+        <span class="fn">fputc</span><span class="pn">(</span>ch<span class="pn">,</span> dest<span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>src<span class="pn">);</span>  <span class="fn">fclose</span><span class="pn">(</span>dest<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"File copied!\n"</span><span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+        </div>
+
+        <!-- Average Example -->
+        <div class="topic-block" id="avg-example">
+          <div class="topic-title">Finding Average of Numbers in Sequential File</div>
+          <div class="topic-body">A classic sequential file example: write numbers to a file, then read them back and compute the average.</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Step 1: Write Numbers to File</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"numbers.txt"</span><span class="pn">,</span> <span class="st">"w"</span><span class="pn">);</span>
+    <span class="ty">int</span> nums<span class="pn">[]</span> <span class="op">=</span> <span class="pn">{</span><span class="nm">45</span><span class="pn">,</span> <span class="nm">80</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">,</span> <span class="nm">90</span><span class="pn">,</span> <span class="nm">72</span><span class="pn">,</span> <span class="nm">55</span><span class="pn">,</span> <span class="nm">88</span><span class="pn">};</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> <span class="nm">7</span><span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="fn">fprintf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d\n"</span><span class="pn">,</span> nums<span class="pn">[</span>i<span class="pn">]);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Written 7 numbers to numbers.txt\n"</span><span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Step 2: Read and Compute Average</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span>  <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"numbers.txt"</span><span class="pn">,</span> <span class="st">"r"</span><span class="pn">);</span>
+    <span class="ty">int</span>    num<span class="pn">,</span> count <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span>
+    <span class="ty">float</span>  sum   <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span>
+
+    <span class="kw">if</span> <span class="pn">(</span>fp <span class="op">==</span> <span class="mc">NULL</span><span class="pn">)</span> <span class="pn">{</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"File not found!\n"</span><span class="pn">);</span> <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span> <span class="pn">}</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Numbers read: "</span><span class="pn">);</span>
+    <span class="kw">while</span> <span class="pn">(</span><span class="fn">fscanf</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="st">"%d"</span><span class="pn">,</span> <span class="op">&amp;</span>num<span class="pn">)</span> <span class="op">==</span> <span class="nm">1</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"%d "</span><span class="pn">,</span> num<span class="pn">);</span>
+        sum <span class="op">+=</span> num<span class="pn">;</span>
+        count<span class="op">++</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+
+    <span class="kw">if</span> <span class="pn">(</span>count <span class="op">==</span> <span class="nm">0</span><span class="pn">)</span> <span class="pn">{</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"No numbers found!\n"</span><span class="pn">);</span> <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span> <span class="pn">}</span>
+
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"\nCount   : %d\n"</span><span class="pn">,</span> count<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Sum     : %.0f\n"</span><span class="pn">,</span> sum<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Average : %.2f\n"</span><span class="pn">,</span> sum <span class="op">/</span> count<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Numbers read: 45 80 65 90 72 55 88<br>Count   : 7<br>Sum     : 495<br>Average : 70.71</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 12: RANDOM ACCESS
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="random">
+      <div class="section-header">
+        <div class="section-icon icon-red">🎯</div>
+        <div class="section-title-block">
+          <h2>Random Access File</h2>
+          <div class="tag">fseek · ftell · rewind · fread · fwrite · binary files</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What is Random Access?</div>
+          <div class="topic-body">
+            <strong>Random access</strong> allows jumping directly to any position in a file without reading through preceding records. It is used with <strong>binary files</strong> where every record has a fixed size, so the position of any record can be calculated as:
+            <br><br>
+            <code>position = record_number × sizeof(record)</code>
+            <br><br>
+            Three key functions for positioning:
+          </div>
+
+          <table class="data-table">
+            <tr><th>Function</th><th>Purpose</th></tr>
+            <tr><td>fseek(fp, offset, whence)</td><td>Move file position pointer to given offset</td></tr>
+            <tr><td>ftell(fp)</td><td>Return current file position (in bytes)</td></tr>
+            <tr><td>rewind(fp)</td><td>Move position to beginning of file</td></tr>
+          </table>
+
+          <div class="tip-box">💡 <strong>fseek whence values:</strong> SEEK_SET (from beginning), SEEK_CUR (from current), SEEK_END (from end)</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Write &amp; Read Binary File (fwrite / fread)</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Employee</span> <span class="pn">{</span>
+    <span class="ty">int</span>   id<span class="pn">;</span>
+    <span class="ty">char</span>  name<span class="pn">[</span><span class="nm">20</span><span class="pn">];</span>
+    <span class="ty">float</span> salary<span class="pn">;</span>
+<span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="kw">struct</span> <span class="ty">Employee</span> emp<span class="pn">[</span><span class="nm">3</span><span class="pn">]</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pn">{</span><span class="nm">1</span><span class="pn">,</span> <span class="st">"Alice"</span><span class="pn">,</span> <span class="nm">50000</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">2</span><span class="pn">,</span> <span class="st">"Bob"</span><span class="pn">,</span>   <span class="nm">45000</span><span class="pn">},</span>
+        <span class="pn">{</span><span class="nm">3</span><span class="pn">,</span> <span class="st">"Carol"</span><span class="pn">,</span> <span class="nm">60000</span><span class="pn">}</span>
+    <span class="pn">};</span>
+
+    <span class="cm">/* Write binary */</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"emp.dat"</span><span class="pn">,</span> <span class="st">"wb"</span><span class="pn">);</span>
+    <span class="fn">fwrite</span><span class="pn">(</span>emp<span class="pn">,</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Employee</span><span class="pn">),</span> <span class="nm">3</span><span class="pn">,</span> fp<span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+
+    <span class="cm">/* Read record #2 directly (index 1) */</span>
+    <span class="kw">struct</span> <span class="ty">Employee</span> e<span class="pn">;</span>
+    fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"emp.dat"</span><span class="pn">,</span> <span class="st">"rb"</span><span class="pn">);</span>
+    <span class="fn">fseek</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="nm">1</span> <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Employee</span><span class="pn">),</span> <span class="mc">SEEK_SET</span><span class="pn">);</span>
+    <span class="fn">fread</span><span class="pn">(</span><span class="op">&amp;</span>e<span class="pn">,</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Employee</span><span class="pn">),</span> <span class="nm">1</span><span class="pn">,</span> fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Record 2: ID=%d Name=%s Salary=%.0f\n"</span><span class="pn">,</span>
+           e<span class="op">.</span>id<span class="pn">,</span> e<span class="op">.</span>name<span class="pn">,</span> e<span class="op">.</span>salary<span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Record 2: ID=2 Name=Bob Salary=45000</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Update a Specific Record</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;string.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">Employee</span> <span class="pn">{</span> <span class="ty">int</span> id<span class="pn">;</span> <span class="ty">char</span> name<span class="pn">[</span><span class="nm">20</span><span class="pn">];</span> <span class="ty">float</span> salary<span class="pn">;</span> <span class="pn">};</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"emp.dat"</span><span class="pn">,</span> <span class="st">"rb+"</span><span class="pn">);</span>   <span class="cm">// open for read+write</span>
+    <span class="kw">struct</span> <span class="ty">Employee</span> e<span class="pn">;</span>
+    <span class="ty">int</span> recNo <span class="op">=</span> <span class="nm">2</span><span class="pn">;</span>    <span class="cm">// update 3rd record (index 2)</span>
+
+    <span class="cm">/* Seek to record position */</span>
+    <span class="fn">fseek</span><span class="pn">(</span>fp<span class="pn">,</span> recNo <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Employee</span><span class="pn">),</span> <span class="mc">SEEK_SET</span><span class="pn">);</span>
+    <span class="fn">fread</span><span class="pn">(</span><span class="op">&amp;</span>e<span class="pn">,</span> <span class="kw">sizeof</span><span class="pn">(</span>e<span class="pn">),</span> <span class="nm">1</span><span class="pn">,</span> fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Before: %s - %.0f\n"</span><span class="pn">,</span> e<span class="op">.</span>name<span class="pn">,</span> e<span class="op">.</span>salary<span class="pn">);</span>
+
+    e<span class="op">.</span>salary <span class="op">=</span> <span class="nm">70000</span><span class="pn">;</span>    <span class="cm">// update salary</span>
+    <span class="fn">fseek</span><span class="pn">(</span>fp<span class="pn">,</span> recNo <span class="op">*</span> <span class="kw">sizeof</span><span class="pn">(</span><span class="kw">struct</span> <span class="ty">Employee</span><span class="pn">),</span> <span class="mc">SEEK_SET</span><span class="pn">);</span>
+    <span class="fn">fwrite</span><span class="pn">(</span><span class="op">&amp;</span>e<span class="pn">,</span> <span class="kw">sizeof</span><span class="pn">(</span>e<span class="pn">),</span> <span class="nm">1</span><span class="pn">,</span> fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"After : %s - %.0f\n"</span><span class="pn">,</span> e<span class="op">.</span>name<span class="pn">,</span> e<span class="op">.</span>salary<span class="pn">);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Before: Carol - 60000<br>After : Carol - 70000</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – ftell and rewind</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">()</span> <span class="pn">{</span>
+    <span class="ty">FILE</span> <span class="op">*</span>fp <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span><span class="st">"numbers.txt"</span><span class="pn">,</span> <span class="st">"r"</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Position at start : %ld\n"</span><span class="pn">,</span> <span class="fn">ftell</span><span class="pn">(</span>fp<span class="pn">));</span>
+
+    <span class="fn">fseek</span><span class="pn">(</span>fp<span class="pn">,</span> <span class="nm">0</span><span class="pn">,</span> <span class="mc">SEEK_END</span><span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"File size (bytes) : %ld\n"</span><span class="pn">,</span> <span class="fn">ftell</span><span class="pn">(</span>fp<span class="pn">));</span>
+
+    <span class="fn">rewind</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"After rewind      : %ld\n"</span><span class="pn">,</span> <span class="fn">ftell</span><span class="pn">(</span>fp<span class="pn">));</span>
+    <span class="fn">fclose</span><span class="pn">(</span>fp<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Position at start : 0<br>File size (bytes) : 21<br>After rewind      : 0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 13: COMMAND LINE ARGUMENTS
+    ═══════════════════════════════════════ -->
+    <div class="section-card" id="cmdargs">
+      <div class="section-header">
+        <div class="section-icon icon-purple">⌨️</div>
+        <div class="section-title-block">
+          <h2>Command Line Arguments</h2>
+          <div class="tag">argc · argv · main() parameters · shell input</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="topic-block">
+          <div class="topic-title">What are Command Line Arguments?</div>
+          <div class="topic-body">
+            <strong>Command line arguments</strong> allow passing values to a C program when it is run from the terminal/shell. These arguments are received by the <code>main()</code> function through two special parameters:
+          </div>
+          <div class="info-box">
+            📌 <strong>argc</strong> (argument count) — number of arguments (including program name, so always ≥ 1)<br>
+            📌 <strong>argv</strong> (argument vector) — array of strings (char*), where argv[0] is the program name
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Syntax</span></div>
+            <pre><span class="ty">int</span> <span class="fn">main</span><span class="pn">(</span><span class="ty">int</span> argc<span class="pn">,</span> <span class="ty">char</span> <span class="op">*</span>argv<span class="pn">[])</span> <span class="pn">{</span>
+    <span class="cm">// argc = number of arguments</span>
+    <span class="cm">// argv[0] = program name</span>
+    <span class="cm">// argv[1] = first argument</span>
+    <span class="cm">// argv[2] = second argument ... and so on</span>
+<span class="pn">}</span></pre>
+          </div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 1 – Print All Arguments</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">(</span><span class="ty">int</span> argc<span class="pn">,</span> <span class="ty">char</span> <span class="op">*</span>argv<span class="pn">[])</span> <span class="pn">{</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Number of arguments: %d\n"</span><span class="pn">,</span> argc<span class="pn">);</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span> i <span class="op">&lt;</span> argc<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"argv[%d] = %s\n"</span><span class="pn">,</span> i<span class="pn">,</span> argv<span class="pn">[</span>i<span class="pn">]);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Run: ./program Hello World 42 */</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output (run as: ./program Hello World 42)</div>Number of arguments: 4<br>argv[0] = ./program<br>argv[1] = Hello<br>argv[2] = World<br>argv[3] = 42</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 2 – Calculator using Command Line Args</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">(</span><span class="ty">int</span> argc<span class="pn">,</span> <span class="ty">char</span> <span class="op">*</span>argv<span class="pn">[])</span> <span class="pn">{</span>
+    <span class="kw">if</span> <span class="pn">(</span>argc <span class="op">!=</span> <span class="nm">4</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"Usage: %s num1 op num2\n"</span><span class="pn">,</span> argv<span class="pn">[</span><span class="nm">0</span><span class="pn">]);</span>
+        <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="ty">float</span> a <span class="op">=</span> <span class="fn">atof</span><span class="pn">(</span>argv<span class="pn">[</span><span class="nm">1</span><span class="pn">]);</span>
+    <span class="ty">char</span>  op <span class="op">=</span> argv<span class="pn">[</span><span class="nm">2</span><span class="pn">][</span><span class="nm">0</span><span class="pn">];</span>
+    <span class="ty">float</span> b <span class="op">=</span> <span class="fn">atof</span><span class="pn">(</span>argv<span class="pn">[</span><span class="nm">3</span><span class="pn">]);</span>
+
+    <span class="kw">switch</span> <span class="pn">(</span>op<span class="pn">)</span> <span class="pn">{</span>
+        <span class="kw">case</span> <span class="st">'+'</span><span class="pn">:</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%.2f\n"</span><span class="pn">,</span> a <span class="op">+</span> b<span class="pn">);</span> <span class="kw">break</span><span class="pn">;</span>
+        <span class="kw">case</span> <span class="st">'-'</span><span class="pn">:</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%.2f\n"</span><span class="pn">,</span> a <span class="op">-</span> b<span class="pn">);</span> <span class="kw">break</span><span class="pn">;</span>
+        <span class="kw">case</span> <span class="st">'*'</span><span class="pn">:</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"%.2f\n"</span><span class="pn">,</span> a <span class="op">*</span> b<span class="pn">);</span> <span class="kw">break</span><span class="pn">;</span>
+        <span class="kw">case</span> <span class="st">'/'</span><span class="pn">:</span>
+            <span class="kw">if</span> <span class="pn">(</span>b <span class="op">==</span> <span class="nm">0</span><span class="pn">)</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"Division by zero!\n"</span><span class="pn">);</span>
+            <span class="kw">else</span>       <span class="fn">printf</span><span class="pn">(</span><span class="st">"%.2f\n"</span><span class="pn">,</span> a <span class="op">/</span> b<span class="pn">);</span>
+            <span class="kw">break</span><span class="pn">;</span>
+        <span class="kw">default</span><span class="pn">:</span> <span class="fn">printf</span><span class="pn">(</span><span class="st">"Unknown operator: %c\n"</span><span class="pn">,</span> op<span class="pn">);</span>
+    <span class="pn">}</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Usage Examples</div>$ ./calc 10 + 5    → 15.00<br>$ ./calc 20 - 8    → 12.00<br>$ ./calc 6 * 7     → 42.00<br>$ ./calc 15 / 4    → 3.75<br>$ ./calc 5 / 0     → Division by zero!</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 3 – File Copy using Command Line Args</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">(</span><span class="ty">int</span> argc<span class="pn">,</span> <span class="ty">char</span> <span class="op">*</span>argv<span class="pn">[])</span> <span class="pn">{</span>
+    <span class="kw">if</span> <span class="pn">(</span>argc <span class="op">!=</span> <span class="nm">3</span><span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"Usage: %s source.txt dest.txt\n"</span><span class="pn">,</span> argv<span class="pn">[</span><span class="nm">0</span><span class="pn">]);</span>
+        <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="ty">FILE</span> <span class="op">*</span>src  <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span>argv<span class="pn">[</span><span class="nm">1</span><span class="pn">],</span> <span class="st">"r"</span><span class="pn">);</span>
+    <span class="ty">FILE</span> <span class="op">*</span>dest <span class="op">=</span> <span class="fn">fopen</span><span class="pn">(</span>argv<span class="pn">[</span><span class="nm">2</span><span class="pn">],</span> <span class="st">"w"</span><span class="pn">);</span>
+    <span class="kw">if</span> <span class="pn">(</span><span class="op">!</span>src <span class="op">||</span> <span class="op">!</span>dest<span class="pn">)</span> <span class="pn">{</span>
+        <span class="fn">printf</span><span class="pn">(</span><span class="st">"Error opening files!\n"</span><span class="pn">);</span>
+        <span class="kw">return</span> <span class="nm">1</span><span class="pn">;</span>
+    <span class="pn">}</span>
+    <span class="ty">int</span> ch<span class="pn">;</span>
+    <span class="kw">while</span> <span class="pn">((</span>ch <span class="op">=</span> <span class="fn">fgetc</span><span class="pn">(</span>src<span class="pn">))</span> <span class="op">!=</span> <span class="mc">EOF</span><span class="pn">)</span>
+        <span class="fn">fputc</span><span class="pn">(</span>ch<span class="pn">,</span> dest<span class="pn">);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Copied '%s' to '%s'\n"</span><span class="pn">,</span> argv<span class="pn">[</span><span class="nm">1</span><span class="pn">],</span> argv<span class="pn">[</span><span class="nm">2</span><span class="pn">]);</span>
+    <span class="fn">fclose</span><span class="pn">(</span>src<span class="pn">);</span> <span class="fn">fclose</span><span class="pn">(</span>dest<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Run: ./copy notes.txt backup.txt */</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output</div>Copied 'notes.txt' to 'backup.txt'</div>
+
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">C</span><span class="code-label">Example 4 – Sum of Numbers passed as Arguments</span></div>
+            <pre><span class="mc">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="mc">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span><span class="pn">(</span><span class="ty">int</span> argc<span class="pn">,</span> <span class="ty">char</span> <span class="op">*</span>argv<span class="pn">[])</span> <span class="pn">{</span>
+    <span class="ty">float</span> sum <span class="op">=</span> <span class="nm">0</span><span class="pn">;</span>
+    <span class="kw">for</span> <span class="pn">(</span><span class="ty">int</span> i <span class="op">=</span> <span class="nm">1</span><span class="pn">;</span> i <span class="op">&lt;</span> argc<span class="pn">;</span> i<span class="op">++</span><span class="pn">)</span>
+        sum <span class="op">+=</span> <span class="fn">atof</span><span class="pn">(</span>argv<span class="pn">[</span>i<span class="pn">]);</span>
+    <span class="fn">printf</span><span class="pn">(</span><span class="st">"Sum = %.2f\n"</span><span class="pn">,</span> sum<span class="pn">);</span>
+    <span class="kw">return</span> <span class="nm">0</span><span class="pn">;</span>
+<span class="pn">}</span>
+
+<span class="cm">/* Run: ./sum 10 20 30 40 */</span></pre>
+          </div>
+          <div class="output-box"><div class="output-label">Output (run as: ./sum 10 20 30 40)</div>Sum = 100.00</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-icon">SN</div>
+    <span class="logo-text">Scholar<span>Nest</span></span>
+  </div>
+  <p>C Programming Reference · Structures &amp; File Processing</p>
+  <p style="margin-top:8px;">
+    <a href="https://scholarnest21.netlify.app" target="_blank">scholarnest21.netlify.app</a>
+    &nbsp;·&nbsp; Made with ❤️ for learners
+  </p>
+</footer>
+
+</body>
+</html>
